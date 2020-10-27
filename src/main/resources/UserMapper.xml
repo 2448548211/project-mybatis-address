@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.clever.chen.address.mapper.UserMapper">
+    <resultMap id="BaseResultMap" type="User">
+        <id property="userId" column="user_id"/>
+        <result column="username" property="username"/>
+        <result column="password" property="password"/>
+        <result column="phone" property="phone"/>
+    </resultMap>
+    <resultMap id="CollectionResultMap" type="User" extends="BaseResultMap">
+        <collection property="addrs" resultMap="com.clever.chen.address.mapper.AddressMapper.BaseType"/>
+    </resultMap>
+    <!--使用sql+include来复用公共sql-->
+    <sql id="BaseColumns">
+        username,
+        password,
+        phone
+    </sql>
+    <insert id="insert" useGeneratedKeys="true" keyProperty="user.userId">
+        INSERT INTO user (
+            <include refid="BaseColumns">
+            </include>
+        )
+        VALUES (#{user.username}, #{user.password}, #{user.phone})
+    </insert>
+
+    <select id="selectAll" resultMap="CollectionResultMap">
+        SELECT u.user_id,u.username, u.password, u.phone,a.addr_id, a.addr_area, a.addr_detail, a.def
+        FROM user u LEFT JOIN address a ON u.user_id = a.user_id
+        WHERE u.status = 0 AND a.status = 0
+    </select>
+
+    <update id="update" useGeneratedKeys="true" keyProperty="user.userId">
+        UPDATE user
+        <!--<set>
+            <if test="user.username!=null"> ...</if>
+            可以自动生成set
+            可以自动删除一个条件的 ','
+        </set>
+        <where>
+            自动生成where
+            不能自动删除and,如果只有一个条件的话
+        </where>-->
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="user.username==null">
+                username = #{user.username},
+            </if>
+            <if test="user.password==null">
+                password = #{user.password},
+            </if>
+            <if test="user.phone==null">
+                phone = #{user.phone}
+            </if>
+        </trim>
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <if test="user.userId!=null">
+                user_id = #{user.userId}
+            </if>
+            <if test="user.username!=null">
+                AND username = #{user.username}
+            </if>
+        </trim>
+    </update>
+
+    <update id="delete">
+        UPDATE user
+        SET status = 1
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <if test="user.userId!=null">
+                user_id = #{user.userId}
+            </if>
+            <if test="user.username!=null">
+                AND username = #{user.username}
+            </if>
+        </trim>
+    </update>
+</mapper>

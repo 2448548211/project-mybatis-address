@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="MyBatisCodeHelperDatasource">
+    <option name="projectProfile">
+      <ProjectProfile>
+        <option name="generatedClassPathList">
+          <list>
+            <option value="D:\workbench\livePractice\b_twoSS\day53\project-mybatis-address\src\main\java\com\clever\chen\address\entity" />
+          </list>
+        </option>
+      </ProjectProfile>
+    </option>
+  </component>
+</project>

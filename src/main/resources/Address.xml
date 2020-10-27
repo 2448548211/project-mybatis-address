@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.clever.chen.address.mapper.AddressMapper">
+    <resultMap id="BaseType" type="Address">
+        <id property="addrId" column="addr_id"/>
+        <result column="addr_area" property="addrArea"/>
+        <result column="addr_detail" property="addrDetail"/>
+        <result column="def" property="def"/>
+    </resultMap>
+    <!--<sql id="BaseCols">
+        user_id,
+        addr_area,
+        addr_detail
+    </sql>
+    <sql id="UpdateCols">
+        user_id,
+        addr_area,
+        addr_detail
+    </sql>-->
+    <select id="selectAddrByUserId" resultMap="BaseType">
+        SELECT addr_id,addr_area, addr_detail, def
+        FROM address
+        WHERE user_id = #{userId} AND status = 0
+    </select>
+    <!--jdbcType=VARCHAR 表示这个数据在数据库里是VARCHAR类型-->
+    <insert id="insertAddr" useGeneratedKeys="true" keyProperty="addr.addrId">
+        INSERT INTO address(user_id, addr_area, addr_detail)
+        VALUES (#{addr.userId},#{addr.addrArea},#{addr.addrDetail})
+    </insert>
+    <!--插入多个地址-->
+    <insert id="insertMultiAddr">
+        INSERT INTO address(user_id, addr_area, addr_detail)
+        VALUES
+        <foreach collection="addrs" item="addr" open="(" close=")" separator=",">
+            #{addr.userId},#{addr.addrArea},#{addr.addrDetail}
+        </foreach>
+    </insert>
+
+    <update id="delete">
+        UPDATE address
+        SET status = 1
+        WHERE addr_id = #{addr.addrId}
+    </update>
+
+    <update id="update" useGeneratedKeys="true" keyProperty="addr.addrId">
+        UPDATE address
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="addr.addrArea!=null">
+                 addr_area= #{addr.addrArea},
+            </if>
+            <if test="addr.addrDetail != null">
+                addr_detail = #{addr.addrDetail}
+            </if>
+        </trim>
+        WHERE addr_id = #{addr.addrId}
+    </update>
+</mapper>
